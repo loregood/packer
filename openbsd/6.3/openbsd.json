@@ -1,0 +1,72 @@
+{
+  "variables": {
+    "mirror": "https://cloudflare.cdn.openbsd.org/pub/OpenBSD",
+    "version": "6.3",
+    "platform": "amd64",
+    "iso": "install63.iso",
+    "checksum": "ee775405dd7926975befbc3fef23de8c4b5a726c3b5075e4848fcd3a2a712ea8"
+  },
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "../scripts/postinstall.sh",
+        "../scripts/vagrant.sh",
+        "../scripts/minimize.sh"
+      ],
+      "execute_command": "export {{.Vars}} && cat {{.Path}} | su -m"
+    }
+  ],
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "boot_command": [
+        "S<enter>",
+        "cat <<EOF >>install.conf<enter>",
+        "Choose your keyboard layout = us<enter>",
+        "System hostname = openbsd<enter>",
+        "Password for root = vagrant<enter>",
+        "Do you expect to run the X Window System = no<enter>",
+        "Setup a user = vagrant<enter>",
+        "Password for user = vagrant<enter>",
+        "Allow root ssh login = yes<enter>",
+        "What timezone are you in = ETC<enter>",
+        "Location of sets = cd<enter>",
+        "Directory does not contain SHA256.sig. Continue without verification = yes<enter>",
+        "EOF<enter>",
+        "install -af install.conf && reboot<enter>"
+      ],
+      "boot_wait": "20s",
+      "disk_size": 19140,
+      "guest_additions_mode": "disable",
+      "guest_os_type": "OpenBSD_64",
+      "iso_checksum": "{{user `checksum`}}",
+      "iso_checksum_type": "sha256",
+      "iso_url": "{{user `mirror`}}/{{user `version`}}/{{user `platform`}}/{{user `iso`}}",
+      "output_directory": "packer-openbsd-{{user `version`}}_{{user `platform`}}",
+      "shutdown_command": "/sbin/halt -p",
+      "ssh_username": "root",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--memory", "1024" ],
+        [ "modifyvm", "{{.Name}}", "--cpus", "1" ]
+      ],
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "OpenBSD-{{user `version`}}_{{user `platform`}}"
+    }
+  ],
+  "post-processors": [
+    [{
+      "type": "vagrant",
+      "output": "OpenBSD-{{user `version`}}_{{user `platform`}}",
+      "vagrantfile_template": "../Vagrantfile.template"
+     },
+     {
+      "type": "shell-local",
+      "inline": ["vagrant box add OpenBSD-{{user `version`}}_{{user `platform`}} --force --provider virtualbox --name OpenBSD-{{user `version`}}_{{user `platform`}} && rm -rf vagrant box add OpenBSD-{{user `version`}}_{{user `platform`}}"]
+     }
+    ]
+  ]
+}
