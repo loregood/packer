@@ -1,5 +1,5 @@
 # Building OS box images with Packer
-This repository builds various machine images from OS ISO release install CD's -- using HashiCorp Packer and Vagrant.
+This repository builds various machine images from OS release installs -- using [HashiCorp](https://www.hashicorp.com) Packer and Vagrant.
 
 
 ### Requirements
@@ -23,15 +23,15 @@ Using Vagrant to "control" how the Virtual Machine is configured in VirtualBox i
 When the above is installed, clone this git repository to a local directory, from your terminal:
 
     $ git clone https://github.com/loregood/packer
+    $ cd packer
 
 Currently I have only OpenBSD machine images, but FreeBSD is comming soon.
 
 
 ### Usage
-Read the README.md in each OS folder for more information.
+Read the README.md in each OS folder for more information:
 
-    $ cd openbsd
-    $ less README.md
+  * [OpenBSD](openbsd/README.md)
 
 If you are new to Vagrant, you should checkout the [Vagrant documentation](https://www.vagrantup.com/docs/).
 
